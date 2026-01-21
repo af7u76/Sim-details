@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚡ Ultra SIM Finder Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --accent: #00f2fe;
+            --accent-dark: #4facfe;
+            --bg: radial-gradient(circle at top right, #1e293b, #0f172a);
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --text-white: #f8fafc;
+            --text-gray: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode {
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-white: #1e293b;
+            --text-gray: #64748b;
+            --border: #e2e8f0;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background 0.3s, color 0.3s; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            background-attachment: fixed;
+            color: var(--text-white);
+            padding: 10px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 480px; margin: 0 auto; }
+
+        .theme-switch { text-align: right; margin-bottom: 10px; }
+        .theme-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-white);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .header { text-align: center; padding: 10px 0; }
+        .header h1 {
+            font-size: 1.6rem;
+            background: linear-gradient(to right, var(--accent), var(--accent-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .search-area {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        #numberInput {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-white);
+            font-size: 15px;
+            outline: none;
+        }
+
+        .input-group { position: relative; }
+        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); }
+
+        .search-btn {
+            width: 100%;
+            background: linear-gradient(45deg, var(--accent-dark), var(--accent));
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+
+        #loadingOverlay { display: none; text-align: center; padding: 30px; }
+        .pulse-loader {
+            width: 50px; height: 50px; background: var(--accent);
+            border-radius: 50%; margin: 0 auto 15px;
+            animation: pulse 1.2s infinite ease-in-out;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            display: none;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 12px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+        .data-table th { color: var(--accent); font-size: 0.7rem; text-transform: uppercase; width: 30%; }
+        .data-table td { font-size: 0.85rem; }
+
+        .num-item {
+            background: rgba(255, 255, 255, 0.03);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border);
+            transition: 0.3s all;
+        }
+        .num-text { font-weight: 700; color: var(--success); font-family: monospace; font-size: 1rem; }
+        .carrier-logo { height: 25px; width: auto; border-radius: 4px; object-fit: contain; background: white; padding: 2px; }
+
+        .verify-mini-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .status-text { font-size: 0.7rem; font-weight: bold; margin-left: 10px; }
+        .v-verified { color: #10b981; }
+
+        .action-btns {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .btn-copy { background: #34495e; }
+        .btn-v-all { background: #e67e22; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="theme-switch">
+        <button class="theme-btn" onclick="toggleTheme()">
+            <i class="fas fa-moon"></i> Switch Theme
+        </button>
+    </div>
+
+    <div class="header">
+        <h1>⚡ DATA FINDER PRO</h1>
+    </div>
+
+    <div class="search-area">
+        <div class="input-group">
+            <i class="fas fa-search"></i>
+            <input type="text" id="numberInput" placeholder="Enter Number (03xx)" inputmode="numeric">
+        </div>
+        <button class="search-btn" onclick="masterSearch()" id="searchBtn">EXPLORE ALL NUMBERS</button>
+    </div>
+
+    <div id="loadingOverlay">
+        <div class="pulse-loader"></div>
+        <p id="loadingMsg">Fetching Records...</p>
+    </div>
+
+    <div id="resultCard" class="result-card">
+        <table class="data-table">
+            <tbody id="basicInfoBody"></tbody>
+        </table>
+        <div style="margin: 20px 0 10px; font-size: 0.8rem; color: var(--accent); font-weight: 700;">
+            <i class="fas fa-sim-card"></i> ALL NUMBERS ON THIS CNIC
+        </div>
+        <div id="numberList"></div>
+        
+        <div class="action-btns" id="actionBox" style="display: none;">
+            <button class="action-btn btn-copy" onclick="copyResult()">
+                <i class="fas fa-copy"></i> COPY DATA
+            </button>
+            <button class="action-btn btn-v-all" onclick="verifyAll()" id="vAllBtn">
+                <i class="fas fa-check-double"></i> VERIFY ALL
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://api.cnic.pro/?num="; 
+    const VERIFY_URL = "https://dirbs.pta.gov.pk/drs/auth/register_individual";
+    let storedCNIC = "";
+    let ownerName = "";
+    let ownerAddress = "";
+    let currentNumbers = [];
+
+    function toggleTheme() { document.body.classList.toggle('light-mode'); }
+
+    const getCarrierName = (num) => {
+        let n = num.replace(/^92/, '0');
+        if (!n.startsWith('0')) n = '0' + n;
+        const p = n.substring(0, 3);
+        const carriers = {'030':'JAZZ', '034':'TELENOR', '031':'ZONG', '032':'WARID', '033':'UFONE'};
+        return carriers[p] || 'SIM';
+    };
+
+    const getLocalLogo = (num) => {
+        let n = num.replace(/^92/, '0');
+        if (!n.startsWith('0')) n = '0' + n;
+        const p = n.substring(0, 3);
+        const logos = {'030':'Jazz.jpeg', '034':'T.png', '031':'zong.png', '032':'Warud.png', '033':'Ufone.png'};
+        return logos[p] || 'sim.png';
+    };
+
+    async function masterSearch() {
+        const input = document.getElementById('numberInput').value.trim();
+        const btn = document.getElementById('searchBtn');
+        const loader = document.getElementById('loadingOverlay');
+        const card = document.getElementById('resultCard');
+        const actBox = document.getElementById('actionBox');
+
+        if (!input) return alert("Enter Number!");
+
+        btn.disabled = true;
+        loader.style.display = "block";
+        card.style.display = "none";
+        actBox.style.display = "none";
+
+        try {
+            const res1 = await fetch(`${API_URL}${input}`);
+            const data1 = await res1.json();
+
+            if (data1 && data1.length > 0) {
+                storedCNIC = data1[0].CNIC;
+                ownerName = data1[0].Name;
+                ownerAddress = data1[0].ADDRESS;
+                
+                const res2 = await fetch(`${API_URL}${storedCNIC}`);
+                const allData = await res2.json();
+                currentNumbers = allData;
+
+                document.getElementById('basicInfoBody').innerHTML = `
+                    <tr><th>Name</th><td>${ownerName}</td></tr>
+                    <tr><th>CNIC</th><td style="color:var(--accent)">${storedCNIC}</td></tr>
+                    <tr><th>Address</th><td style="font-size:0.7rem">${ownerAddress}</td></tr>
+                `;
+
+                const numList = document.getElementById('numberList');
+                numList.innerHTML = "";
+                allData.forEach((item, i) => {
+                    if(item.Mobile) {
+                        numList.innerHTML += `
+                        <div class="num-item" id="row-${i}">
+                            <div>
+                                <span class="num-text">${item.Mobile}</span>
+                                <button class="verify-mini-btn" id="vb-${i}" onclick="manualVerify('${item.Mobile}', '${i}')">Verify</button>
+                                <span id="st-${i}" class="status-text"></span>
+                            </div>
+                            <img src="${getLocalLogo(item.Mobile)}" class="carrier-logo">
+                        </div>`;
+                    }
+                });
+                card.style.display = "block";
+                actBox.style.display = "grid";
+            } else { alert("No Record Found!"); }
+        } catch (e) { alert("Server Error!"); }
+        finally { btn.disabled = false; loader.style.display = "none"; }
+    }
+
+    async function manualVerify(phone, i) {
+        const btn = document.getElementById(`vb-${i}`);
+        const stat = document.getElementById(`st-${i}`);
+        const row = document.getElementById(`row-${i}`);
+        if(!btn || btn.style.display === "none") return;
+        btn.innerText = "...";
+        
+        try {
+            const body = new URLSearchParams({
+                purpose: "foreigners_temporary_unblocking",
+                user_type_of_individual: "local",
+                phone: phone,
+                cnic_number: storedCNIC,
+                first_name: "Ali Raza",
+                email: "bii3267c17185@gmail.com",
+                city_id: "36",
+                address: "PO 424 JB TT Singh",
+                passport_number: "LD6801861",
+                password_for_edit_profile: "TestPassword123",
+                confirm_password_for_edit_profile: "TestPassword123"
+            });
+
+            const response = await fetch(VERIFY_URL, { method: "POST", body: body });
+            const html = await response.text();
+            const msg = new DOMParser().parseFromString(html, "text/html").querySelector(".toast-message")?.textContent || "";
+
+            if (msg.includes("not issued against given CNIC")) {
+                row.setAttribute("data-status", "wrong");
+                row.style.display = "none";
+            } else if (msg.includes("already exists") || msg.includes("Verified")) {
+                btn.style.display = "none";
+                stat.innerHTML = "Verified ✅"; 
+                stat.className = "status-text v-verified";
+                row.setAttribute("data-status", "verified");
+            } else { 
+                btn.style.display = "none";
+                stat.innerHTML = "Checked"; 
+            }
+        } catch (e) { btn.innerText = "Verify"; }
+    }
+
+    async function verifyAll() {
+        const vAllBtn = document.getElementById('vAllBtn');
+        vAllBtn.disabled = true;
+        vAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        for (let i = 0; i < currentNumbers.length; i++) {
+            if(currentNumbers[i].Mobile) {
+                await manualVerify(currentNumbers[i].Mobile, i);
+                await new Promise(r => setTimeout(r, 400));
+            }
+        }
+        vAllBtn.innerHTML = '<i class="fas fa-check-double"></i> DONE';
+    }
+
+    function copyResult() {
+        let separator = "══════════════════════════════";
+        let text = `${separator}\n👤 Citizen Information\n${separator}\n`;
+        text += `Name: *${ownerName} .*\n`;
+        text += `CNIC: ${storedCNIC}\n`;
+        text += `Address: *${ownerAddress}*\n`;
+        text += `${separator}\n*Actvite No on cnic*\n${separator}\n`;
+
+        const visibleRows = document.querySelectorAll('.num-item');
+        let hasNumbers = false;
+        
+        visibleRows.forEach(row => {
+            if(row.style.display !== "none") {
+                const num = row.querySelector('.num-text').innerText;
+                const carrier = getCarrierName(num);
+                text += `${num} (${carrier})\n`;
+                hasNumbers = true;
+            }
+        });
+
+        if(!hasNumbers) text += "No verified numbers found.\n";
+        text += `------------------`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Data Copied in Professional Format!");
+        });
+    }
+</script>
+</body>
+</html>
